@@ -6,7 +6,7 @@ namespace examples
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            Keys.Main(args);
         }
     }
 }
