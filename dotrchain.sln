@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31129.286
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dotrchain", "dotrchain\dotrchain.csproj", "{DD2D5DDF-0959-40D6-9E3F-DDA99AA43607}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "examples", "examples\examples.csproj", "{5F2F8222-E3F0-43E9-B062-8A953B888F71}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DD2D5DDF-0959-40D6-9E3F-DDA99AA43607}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DD2D5DDF-0959-40D6-9E3F-DDA99AA43607}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DD2D5DDF-0959-40D6-9E3F-DDA99AA43607}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DD2D5DDF-0959-40D6-9E3F-DDA99AA43607}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5F2F8222-E3F0-43E9-B062-8A953B888F71}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5F2F8222-E3F0-43E9-B062-8A953B888F71}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5F2F8222-E3F0-43E9-B062-8A953B888F71}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5F2F8222-E3F0-43E9-B062-8A953B888F71}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A6EE9C51-EF75-409F-8F21-5A371B797520}
+	EndGlobalSection
+EndGlobal
