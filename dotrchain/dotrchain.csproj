@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="BouncyCastle.NetCore" Version="1.8.8" />
+    <PackageReference Include="NokitaKaze.Base58Check" Version="0.4.2" />
   </ItemGroup>
 
 </Project>

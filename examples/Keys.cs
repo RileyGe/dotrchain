@@ -21,35 +21,30 @@ namespace examples
             if(generatedPk == privateKeyHex)
             {
                 Console.WriteLine("Right!");
+                Console.WriteLine(pk2.ToHex());
             }
             else
             {
-                Console.WriteLine("Wrong!");
+                Console.WriteLine("Private key wrong!");
             }
-            Console.WriteLine(pk2.ToHex());
 
-            //var bytes = StringToByteArray(privateKeyHex);
+            var publicKey = pk2.PublicKey;
+            var pkHex = "04ad4793d81c5ee6c91c4baf2689c5299276c4774a8625fa87257f62ba8f3fe31f79d1351bd83af800afdaa94d40fe46c969f0ce2ac2e03e45d5a2d8a7687c39c0";
+            var publicKey2 = new PublicKey(pkHex);
+            if(publicKey2.ToHex() == pkHex)
+            {
+                Console.WriteLine("Right!");
+                Console.WriteLine(publicKey2.ToHex());
+            }
+            else
+            {
+                Console.WriteLine("Public key wrong!");
+            }
 
-
-            //Console.WriteLine(ToHex(bytes));
+            var ethAddress = publicKey2.EthAddress;
+            var revAddress = publicKey2.RevAddress;
+            //sign example
         }
 
-        //static string ToHex(byte[] data)
-        //{
-        //    string hex = "";
-        //    foreach (var bt in data)
-        //    {
-        //        hex += bt.ToString("x2");
-        //    }
-        //    return hex;
-        //}
-
-        //public static byte[] StringToByteArray(string hex)
-        //{
-        //    return Enumerable.Range(0, hex.Length)
-        //                     .Where(x => x % 2 == 0)
-        //                     .Select(x => Convert.ToByte(hex.Substring(x, 2), 16))
-        //                     .ToArray();
-        //}
     }
 }
