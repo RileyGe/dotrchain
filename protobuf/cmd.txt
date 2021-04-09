@@ -1,0 +1,1 @@
+protogen --csharp_out=./dotrchain/pb --package=dotrchain scalapb/scalapb.proto CasperMessage.proto DeployServiceCommon.proto DeployServiceV1.proto ProposeServiceCommon.proto ProposeServiceV1.proto RhoTypes.proto  ServiceError.proto
