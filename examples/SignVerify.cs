@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using dotrchain;
 
 namespace examples
@@ -21,7 +19,7 @@ namespace examples
             var pk = new PrivateKey(privateKeyHex);
             var deployData = Util.SignDeploy(pk, contract);
             var publicKey = pk.PublicKey;
-            if(Util.VerifyDeploy(publicKey, deployData.Sig, deployData))
+            if(Util.VerifyDeploy(publicKey, deployData.Sig.ToByteArray(), deployData))
             {
                 Console.WriteLine("Right!");
             }

@@ -7,10 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="SignVerify.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\dotrchain\dotrchain.csproj" />
   </ItemGroup>
 

@@ -12,7 +12,6 @@
 
   <ItemGroup>
     <Compile Remove="DeployData.cs" />
-    <Compile Remove="Util.cs" />
   </ItemGroup>
 
   <ItemGroup>

@@ -6,8 +6,8 @@ namespace examples
     {
         static void Main(string[] args)
         {
-            Keys.Main(args); return;
-            //SignVerify.Main(args); return;
+            //Keys.Main(args); return;
+            SignVerify.Main(args); return;
         }
     }
 }
