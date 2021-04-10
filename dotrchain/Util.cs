@@ -17,11 +17,11 @@ namespace dotrchain
             {
                 Deployer = key.PublicKey.Bytes,
                 Term = term,
-                phloPrice = phloPrice,
-                phloLimit = phloLimit,
-                validAfterBlockNumber = validAfterBlockNo,
+                PhloPrice = phloPrice,
+                PhloLimit = phloLimit,
+                ValidAfterBlockNumber = validAfterBlockNo,
                 Timestamp = timestampMillis,
-                sigAlgorithm = "secp256k1",                
+                SigAlgorithm = "secp256k1",                
             };
             data.Sig = key.Sign(GenDeployDataForSig(data));
             return data;

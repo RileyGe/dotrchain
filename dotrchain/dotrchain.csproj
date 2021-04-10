@@ -5,13 +5,21 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="pb-bak\**" />
+    <EmbeddedResource Remove="pb-bak\**" />
+    <None Remove="pb-bak\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Remove="DeployData.cs" />
+    <Compile Remove="Util.cs" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="BouncyCastle.NetCore" Version="1.8.8" />
+    <PackageReference Include="Google.Protobuf" Version="3.15.8" />
+    <PackageReference Include="Grpc.Core" Version="2.37.0" />
     <PackageReference Include="NokitaKaze.Base58Check" Version="0.4.2" />
-    <PackageReference Include="protobuf-net" Version="3.0.101" />
   </ItemGroup>
 
 </Project>
