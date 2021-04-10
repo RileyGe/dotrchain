@@ -53,7 +53,7 @@ namespace dotrchain
         /// </summary>
         /// <param name="privateKeyHex">private key hex string</param>
         public PrivateKey(string privateKeyHex) :
-            this(HexToBytes(privateKeyHex))
+            this(Util.HexToBytes(privateKeyHex))
         { }
         /// <summary>
         /// create a private key from seed
@@ -103,7 +103,7 @@ namespace dotrchain
         /// <returns>private key hex string</returns>
         public string ToHex()
         {
-            return BytesToHex(this.Bytes);
+            return Util.BytesToHex(this.Bytes);
         }
 
         public byte[] Sign(byte[] data)
@@ -137,15 +137,7 @@ namespace dotrchain
         public override int GetHashCode()
         {
             return base.GetHashCode();
-        }
-
-        static string BytesToHex(byte[] data) => 
-            string.Concat(data.Select(x => x.ToString("x2")));
-
-
-        private static byte[] HexToBytes(string hex) =>
-            Enumerable.Range(0, hex.Length).Where(x => x % 2 == 0)
-            .Select(x => Convert.ToByte(hex.Substring(x, 2), 16)).ToArray();
+        }        
     }
     public class PublicKey
     {
