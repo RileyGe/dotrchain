@@ -7,56 +7,56 @@ namespace dotrchain
     public class VaultAPI
     {
         public const string CREATE_VAULT_RHO_TPL = @"
-new rl(`rho:registry:lookup`), RevVaultCh in {
+new rl(`rho:registry:lookup`), RevVaultCh in {{
   rl!(`rho:rchain:revVault`, *RevVaultCh) |
-  for (@(_, RevVault) <- RevVaultCh) {
-    @RevVault!(""findOrCreateVault"", ""$addr"", Nil)
-  }
-}
+  for (@(_, RevVault) <- RevVaultCh) {{
+    @RevVault!(""findOrCreateVault"", ""{0}"", Nil)
+  }}
+}}
 ";
 
         public const string GET_BALANCE_RHO_TPL = @"
-new return, rl(`rho:registry:lookup`), RevVaultCh, vaultCh, balanceCh in {
+new return, rl(`rho:registry:lookup`), RevVaultCh, vaultCh, balanceCh in {{
   rl!(`rho:rchain:revVault`, *RevVaultCh) |
-  for (@(_, RevVault) <- RevVaultCh) {
+  for (@(_, RevVault) <- RevVaultCh) {{
     @RevVault!(""findOrCreate"", ""{0}"", *vaultCh) |
-    for (@(true, vault) <- vaultCh) {
+    for (@(true, vault) <- vaultCh) {{
       @vault!(""balance"", *balanceCh) |
-      for (@balance <- balanceCh) {
+      for (@balance <- balanceCh) {{
         return!(balance)
-      }
-    }
-  }
-}
+      }}
+    }}
+  }}
+}}
 ";
 
         public const string TRANSFER_RHO_TPL = @"
-new rl(`rho:registry:lookup`), RevVaultCh, vaultCh, revVaultKeyCh, deployerId(`rho:rchain:deployerId`), stdout(`rho:io:stdout`), resultCh in {
+new rl(`rho:registry:lookup`), RevVaultCh, vaultCh, revVaultKeyCh, deployerId(`rho:rchain:deployerId`), stdout(`rho:io:stdout`), resultCh in {{
   rl!(`rho:rchain:revVault`, *RevVaultCh) |
-  for (@(_, RevVault) <- RevVaultCh) {
+  for (@(_, RevVault) <- RevVaultCh) {{
     @RevVault!(""findOrCreate"", ""{0}"", *vaultCh) |
     @RevVault!(""deployerAuthKey"", *deployerId, *revVaultKeyCh) |
-    for (@(true, vault) <- vaultCh; key <- revVaultKeyCh) {
+    for (@(true, vault) <- vaultCh; key <- revVaultKeyCh) {{
       @vault!(""transfer"", ""{1}"", {2}, *key, *resultCh) |
-      for (_ <- resultCh) { Nil }
-    }
-  }
-}
+      for (_ <- resultCh) {{ Nil }}
+    }}
+  }}
+}}
 ";
 
         public const string TRANSFER_ENSURE_TO_RHO_TPL = @"
-new rl(`rho:registry:lookup`), RevVaultCh, vaultCh, toVaultCh, deployerId(`rho:rchain:deployerId`), revVaultKeyCh, resultCh in {
+new rl(`rho:registry:lookup`), RevVaultCh, vaultCh, toVaultCh, deployerId(`rho:rchain:deployerId`), revVaultKeyCh, resultCh in {{
   rl!(`rho:rchain:revVault`, *RevVaultCh) |
-  for (@(_, RevVault) <- RevVaultCh) {
+  for (@(_, RevVault) <- RevVaultCh) {{
     @RevVault!(""findOrCreate"", ""{0}"", *vaultCh) |
     @RevVault!(""findOrCreate"", ""{1}"", *toVaultCh) |
     @RevVault!(""deployerAuthKey"", *deployerId, *revVaultKeyCh) |
-    for (@(true, vault) <- vaultCh; key <- revVaultKeyCh; @(true, toVault) <- toVaultCh) {
+    for (@(true, vault) <- vaultCh; key <- revVaultKeyCh; @(true, toVault) <- toVaultCh) {{
       @vault!(""transfer"", ""{1}"", {2}, *key, *resultCh) |
-      for (_ <- resultCh) { Nil }
-    }
-  }
-}
+      for (_ <- resultCh) {{ Nil }}
+    }}
+  }}
+}}
 ";
 
         // these are predefined param
