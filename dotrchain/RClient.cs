@@ -66,16 +66,16 @@ namespace dotrchain
     }
     public class RClient
     {
-        private Regex propose_result_match = new Regex(@"Success! Block (?P<block_hash>[0-9a-f]+) created and added.");
-        public Channel Channel;
-        private DeployService.DeployServiceClient client;
+        //private Regex propose_result_match = new Regex(@"Success! Block (?<block_hash>[0-9a-f]+) created and added.");
+        private readonly Channel channel;
+        private readonly DeployService.DeployServiceClient client;
         private Par transferTem;
 
         public RClient(string host, int port, IEnumerable<ChannelOption> options = null)
         {
             if (options is null) options = new ChannelOption[] { };
-            Channel = new Channel(host, port, ChannelCredentials.Insecure, options);
-            client = new DeployService.DeployServiceClient(Channel);
+            channel = new Channel(host, port, ChannelCredentials.Insecure, options);
+            client = new DeployService.DeployServiceClient(channel);
         }
 
         public void ConfigParam(Par transferTem)
@@ -136,7 +136,7 @@ namespace dotrchain
             return response.IsFinalized;
         }
 
-        public List<LightBlockInfo> GetBlocksByHeights(long startBlockNumber, long endBlockNumber)
+        public List<BlockInfoResponse> GetBlocksByHeights(long startBlockNumber, long endBlockNumber)
         {
             var query = new BlocksQueryByHeight()
             {
@@ -145,7 +145,7 @@ namespace dotrchain
             };
             var response = client.getBlocksByHeights(query);
             var result = HandleStream(response);
-            return result.ConvertAll(item => item as LightBlockInfo);
+            return result.ConvertAll(item => item as BlockInfoResponse);
         }
 
         public List<Par> ExploratoryDeploy(string term, string blockHash, bool usePreStateHash = false)
@@ -209,95 +209,6 @@ namespace dotrchain
             var latestBlockNum = latestBlock.BlockInfo.BlockNumber;
             return Deploy(key, term, phloPrice, phloLimit, latestBlockNum, timestampMillis);
         }
-
-        //    public  getEventData(blockHash)
-        //    {
-        //        const resp = await this.deployService.getEventByHash({
-        //        hash: blockHash,
-        //});
-        //        return resp;
-        //    }
-
-        //    async getTransaction(blockHash)
-        //    {
-        //        if (this.transferTem && typeof this.transferTem !== "undefined") {
-        //            const resp = await this.getEventData(blockHash);
-        //            var transactions = [];
-        //            resp.result.deploysList.forEach((deploy) => {
-        //                if (deploy.reportList.length === 2)
-        //                {
-        //                }
-        //                else if (deploy.reportList.length === 3)
-        //                {
-        //                    const precharge = deploy.reportList[0];
-        //                    const user = deploy.reportList[1];
-        //                    const refund = deploy.reportList[2];
-        //                    transactions.push(findTransferComm(deploy.deployinfo, user, this.transferTem))
-        //              }
-        //            })
-        //          return transactions;
-        //        }
-
-        //public string propose()
-        //{
-        //    var stub = new ProposeService.ProposeServiceClient(Channel);
-        //    var response = stub.propose(new PrintUnmatchedSendsQuery() { PrintUnmatchedSends = false });
-        //    if (response.Error != null)
-        //    {
-        //        throw new RClientException(response.Error.Messages.ToString());
-        //    }
-        //    var match_result = propose_result_match.Match(response.Result);
-        //    if (match_result is null) throw new RClientException("");
-        //    //assert match_result is not None
-        //    return match_result.Groups["block_hash"].Value;
-        //}
-
-
-        //public ListeningNameDataPayload get_data_at_name(Par par, int depth = -1)
-        //{
-        //    var query = new DataAtNameQuery()
-        //    {
-        //        Depth = depth,
-        //        Name = par
-        //    };
-        //    var response = client.listenForDataAtName(query);
-        //    if (response.Error != null)
-        //    {
-        //        throw new RClientException(response.Error.Messages.ToString());
-        //    }
-        //    var wrapped = response.Payload;
-        //    //return Data.FromString(wrapped.SerializeToString());
-        //    return wrapped;
-        //}
-
-
-        //public void get_data_at_public_names(List<string> names , int depth  = -1)
-        //{
-        //    return get_data_at_name(DataQueries.public_names(names), depth);
-        //}
-
-
-        //def get_data_at_deploy_id(self, deploy_id: str, depth: int = -1) -> Optional[Data]:
-        //    return self.get_data_at_name(DataQueries.deploy_id(deploy_id), depth)
-
-        //def get_blocks_by_heights(self, start_block_number: int, end_block_number: int) -> List[LightBlockInfo]:
-        //    query = BlocksQueryByHeight(startBlockNumber= start_block_number, endBlockNumber= end_block_number)
-        //    response = self._deploy_stub.getBlocksByHeights(query)
-        //    result = self._handle_stream(response)
-        //    return list(map(lambda x: x.blockInfo, result))  # type: ignore
-
-        //def get_continuation(self, par: Par, depth: int = 1) -> ContinuationAtNameResponse:
-        //    query = ContinuationAtNameQuery(depth= depth, names=[par])
-        //    response = self._deploy_stub.listenForContinuationAtName(query)
-        //    self._check_response(response)
-        //    return response
-
-        //def previewPrivateNames(self, public_key: PublicKey, timestamp: int, nameQty: int) -> PrivateNamePreviewResponse:
-        //    query = PrivateNamePreviewQuery(user= public_key.to_bytes(), timestamp= timestamp, nameQty= nameQty)
-        //    response = self._deploy_stub.previewPrivateNames(query)
-        //    self._check_response(response)
-        //    return response
-
         public EventInfoResponse get_event_data(string block_hash)
         {
             var query = new BlockQuery()
@@ -311,15 +222,6 @@ namespace dotrchain
             }
             return response;
         }
-
-
-        //def visual_dag(self, depth: int, showJustificationLines: bool, startBlockNumber: int) -> str:
-        //    query = VisualizeDagQuery(depth= depth, showJustificationLines= showJustificationLines,
-        //                              startBlockNumber= startBlockNumber)
-        //    response = self._deploy_stub.visualizeDag(query)
-        //    result = self._handle_stream(response)
-        //    return ''.join(list(map(lambda x: x.content, result)))  # type: ignore
-
         public List<DeployWithTransaction> get_transaction(string block_hash)
         {
             if (transferTem is null)
@@ -431,7 +333,7 @@ namespace dotrchain
         }
         public void Close()
         {
-            Channel.ShutdownAsync();
+            channel.ShutdownAsync();
         }
     }
 }

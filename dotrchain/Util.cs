@@ -2,6 +2,7 @@
 using Casper;
 using Google.Protobuf;
 using System.Linq;
+using Org.BouncyCastle.Crypto.Digests;
 
 namespace dotrchain
 {
@@ -22,6 +23,7 @@ namespace dotrchain
                 Timestamp = timestampMillis,
                 SigAlgorithm = "secp256k1",                
             };
+            var abc = GenDeployDataForSig(data);
             data.Sig = ByteString.CopyFrom(key.Sign(GenDeployDataForSig(data)));
             return data;
         }
@@ -42,8 +44,17 @@ namespace dotrchain
             return key.Verify(sig, GenDeployDataForSig(data));
         }
 
-        public static long DateTimeToUtc(DateTime dt)
+        public static byte[] Blake2b(byte[] data)
         {
+            Blake2bDigest black2b = new Blake2bDigest(32 * 8);
+            black2b.BlockUpdate(data, 0, data.Length);
+            var hashed = new byte[black2b.GetDigestSize()];
+            black2b.DoFinal(hashed, 0);
+            return hashed;
+        }
+
+        public static long DateTimeToUtc(DateTime dt)
+        {            
             var startTime = DateTime.SpecifyKind(new DateTime(1970, 1, 1), DateTimeKind.Utc);
             return (long)(dt - startTime).TotalMilliseconds;
         }

@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using Org.BouncyCastle.Asn1.Sec;
 using Org.BouncyCastle.Asn1.X9;
-using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Digests;
 using Org.BouncyCastle.Crypto.Generators;
 using Org.BouncyCastle.Crypto.Parameters;
@@ -12,6 +9,9 @@ using Org.BouncyCastle.Math;
 using Org.BouncyCastle.Math.EC;
 using Org.BouncyCastle.Security;
 using NokitaKaze.Base58Check;
+using Org.BouncyCastle.Crypto.Signers;
+using Org.BouncyCastle.Asn1;
+using System.IO;
 
 namespace dotrchain
 {
@@ -108,11 +108,22 @@ namespace dotrchain
 
         public byte[] Sign(byte[] data)
         {
-            ISigner signer = SignerUtilities.GetSigner("SHA-256withECDSA");
-            signer.Init(true, this.privateKey);
-            signer.BlockUpdate(data, 0, data.Length);
-            return signer.GenerateSignature();
-        }
+            byte[] hashed = Util.Blake2b(data);
+            ECDsaSigner signer = new ECDsaSigner();
+            var order = SecNamedCurves.GetByName("secp256k1").Curve.Order;
+            signer.Init(true, this.privateKey);            
+            var rs = signer.GenerateSignature(hashed);
+            var r = rs[0];
+            var s = rs[1];
+            if (s.CompareTo(order.Divide(BigInteger.Two)) > 0)            
+                s = order.Subtract(s);            
+            var ms = new MemoryStream(72);
+            var generate = new DerSequenceGenerator(ms);
+            generate.AddObject(new DerInteger(r));
+            generate.AddObject(new DerInteger(s));
+            generate.Close();
+            return ms.ToArray();
+        }       
 
         public PublicKey PublicKey
         {
@@ -150,7 +161,7 @@ namespace dotrchain
             ECDomainParameters domainParams = new ECDomainParameters(curve, curveParams.G, curveParams.N, curveParams.H);
             this.publicKey = new ECPublicKeyParameters(decodePoint, domainParams);
         }
-        public PublicKey(string publicKeyHex) : this(HexToBytes(publicKeyHex)) { }
+        public PublicKey(string publicKeyHex) : this(Util.HexToBytes(publicKeyHex)) { }
         public PublicKey(ECPublicKeyParameters pk)
         {
             this.publicKey = pk;
@@ -165,15 +176,28 @@ namespace dotrchain
 
         public bool Verify(byte[] signature, byte[] data)
         {
-            ISigner signer = SignerUtilities.GetSigner("SHA-256withECDSA");
+            var hashed = Util.Blake2b(data);
+            //ISigner signer = SignerUtilities.GetSigner("NONEwithECDSA");
+            //signer.Init(false, this.publicKey);
+            //signer.BlockUpdate(hashed, 0, hashed.Length);
+            //return signer.VerifySignature(signature);
+
+            ECDsaSigner signer = new ECDsaSigner();
+            //X9ECParameters paramsd = SecNamedCurves.GetByName("secp256k1");
+            //ECDomainParameters ecParams = new ECDomainParameters(paramsd.Curve, paramsd.G, paramsd.N, paramsd.H);
+            var decoder = new Asn1InputStream(signature);
+            var seq = decoder.ReadObject() as DerSequence;
+            if ((seq == null) || (seq.Count != 2))
+                throw new ArgumentException("InvalidDERSignature");
+            var R = ((DerInteger)seq[0]).Value;
+            var S = ((DerInteger)seq[1]).Value;
             signer.Init(false, this.publicKey);
-            signer.BlockUpdate(data, 0, data.Length);
-            return signer.VerifySignature(signature);
+            return signer.VerifySignature(hashed, R, S);
         }
 
         public string ToHex()
         {
-            return BytesToHex(this.Bytes);
+            return Util.BytesToHex(this.Bytes);
         }
 
         public string EthAddress
@@ -185,7 +209,7 @@ namespace dotrchain
                 digest.BlockUpdate(rawBytes, 0, rawBytes.Length);
                 var calculatedHash = new byte[digest.GetDigestSize()];
                 digest.DoFinal(calculatedHash, 0);
-                var rawHex = BytesToHex(calculatedHash);
+                var rawHex = Util.BytesToHex(calculatedHash);
                 return rawHex.Substring(rawHex.Length - 40);
             }
         }
@@ -229,12 +253,5 @@ namespace dotrchain
         {
             return base.GetHashCode();
         }
-
-        static string BytesToHex(byte[] data) =>
-            string.Concat(data.Select(x => x.ToString("x2")));
-        private static byte[] HexToBytes(string hex) =>
-            Enumerable.Range(0, hex.Length).Where(x => x % 2 == 0)
-            .Select(x => Convert.ToByte(hex.Substring(x, 2), 16)).ToArray();
-
     }
 }
