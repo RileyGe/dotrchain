@@ -196,7 +196,7 @@ namespace dotrchain
             return Util.BytesToHex(deploy.Sig.ToByteArray());
         }
 
-        public string DeployWithVabnFilled(PrivateKey key, string term, int phloPrice, int phloLimit, long timestampMillis = -1)
+        public string DeployWithVabnFilled(PrivateKey key, string term, long phloPrice, long phloLimit, long timestampMillis = -1)
         {
             var latestBlocks = ShowBlocks(1);
             // when the genesis block is not ready, it would be empty in show_blocks
