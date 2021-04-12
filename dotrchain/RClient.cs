@@ -69,7 +69,7 @@ namespace dotrchain
         //private Regex propose_result_match = new Regex(@"Success! Block (?<block_hash>[0-9a-f]+) created and added.");
         private readonly Channel channel;
         private readonly DeployService.DeployServiceClient client;
-        private Par transferTem;
+        private Par param;
 
         public RClient(string host, int port, IEnumerable<ChannelOption> options = null)
         {
@@ -78,9 +78,9 @@ namespace dotrchain
             client = new DeployService.DeployServiceClient(channel);
         }
 
-        public void ConfigParam(Par transferTem)
+        public void ConfigParam(Par netParam)
         {
-            this.transferTem = transferTem;
+            this.param = netParam;
         }
 
         public List<BlockInfoResponse> ShowBlocks(int depth)
@@ -224,7 +224,7 @@ namespace dotrchain
         }
         public List<DeployWithTransaction> get_transaction(string block_hash)
         {
-            if (transferTem is null)
+            if (param is null)
                 throw new RClientException("You haven't install your network param.");
             var transactions = new List<DeployWithTransaction>();
             var event_data = get_event_data(block_hash);
@@ -247,7 +247,7 @@ namespace dotrchain
                     transactions.Add(new DeployWithTransaction()
                     {
                         deploy_info = deploy.DeployInfo,
-                        transactions = FindTransferComm(user, this.transferTem)
+                        transactions = FindTransferComm(user, this.param)
                     });
                     //transactions.Add(findTransferComm(deploy.DeployInfo, user, this.transferTem));                        
                 }
