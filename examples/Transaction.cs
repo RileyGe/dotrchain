@@ -17,7 +17,7 @@ namespace examples
             // but different network has different param based on the genesis block
             client.ConfigParam(Params.TestnetParam);
             var block_hash = "7850712f679aa73cac5648867652d78337ace8066ece72edb195bedfa5f2eeef";
-            var testnet_transactions = client.get_transaction(block_hash);
+            var testnet_transactions = client.GetTransactions(block_hash);
         }
     }
 }

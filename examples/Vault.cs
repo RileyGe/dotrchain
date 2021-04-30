@@ -20,24 +20,24 @@ namespace examples
             var vault = new VaultAPI(client);
             // get the balance of a vault
             // get balance can only perform in the read-only node
-            var bob_balance = vault.get_balance(bob.PublicKey.RevAddress);
+            var bob_balance = vault.GetBalance(bob.PublicKey.RevAddress);
             Console.WriteLine($"Bob's balance is {bob_balance}");
-            var alice_balance = vault.get_balance(alice.PublicKey.RevAddress);
+            var alice_balance = vault.GetBalance(alice.PublicKey.RevAddress);
             Console.WriteLine($"Alice's balance is {alice_balance}");
             var client2 = new RClient(host, port);
             // because transfer need a valid deploy
             // the transfer need the private to perform signing
             var vault2 = new VaultAPI(client2);
-            var deployId = vault2.transfer(alice.PublicKey.RevAddress, bob.PublicKey.RevAddress, 100000, alice);
+            var deployId = vault2.Transfer(alice.PublicKey.RevAddress, bob.PublicKey.RevAddress, 100000, alice);
             Console.WriteLine($"The deploy id is: {deployId}");
             //while (true)
             //{
                 
             //    if(!client.IsFinalized(de))
             //}
-            bob_balance = vault.get_balance(bob.PublicKey.RevAddress);
+            bob_balance = vault.GetBalance(bob.PublicKey.RevAddress);
             Console.WriteLine($"Bob's balance is {bob_balance}");
-            alice_balance = vault.get_balance(alice.PublicKey.RevAddress);
+            alice_balance = vault.GetBalance(alice.PublicKey.RevAddress);
             Console.WriteLine($"Alice's balance is {alice_balance}");
         }
     }

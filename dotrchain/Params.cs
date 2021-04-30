@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace dotrchain
+﻿namespace dotrchain
 {
     /// <summary>
     /// These parameter are pre defined params which can help access the data quicklier.

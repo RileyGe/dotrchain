@@ -1,11 +1,10 @@
 ﻿using Grpc.Core;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using Casper.V1;
 using Casper;
 using System.Linq;
-using System.Text.RegularExpressions;
+using Google.Protobuf;
 
 namespace dotrchain
 {
@@ -168,8 +167,8 @@ namespace dotrchain
         {
             var query = new FindDeployQuery()
             {
-                DeployId = Google.Protobuf.ByteString.CopyFrom(Util.HexToBytes(deployId))
-            };
+                DeployId = ByteString.CopyFrom(Util.HexToBytes(deployId))
+            };            
             var response = client.findDeploy(query);
             if (response.Error != null)
             {
@@ -209,11 +208,11 @@ namespace dotrchain
             var latestBlockNum = latestBlock.BlockInfo.BlockNumber;
             return Deploy(key, term, phloPrice, phloLimit, latestBlockNum, timestampMillis);
         }
-        public EventInfoResponse get_event_data(string block_hash)
+        public EventInfoResponse GetEventData(string blockHash)
         {
             var query = new BlockQuery()
             {
-                Hash = block_hash
+                Hash = blockHash
             };
             var response = client.getEventByHash(query);
             if (response.Error != null)
@@ -222,12 +221,12 @@ namespace dotrchain
             }
             return response;
         }
-        public List<DeployWithTransaction> get_transaction(string block_hash)
+        public List<DeployWithTransaction> GetTransactions(string blockHash)
         {
             if (param is null)
                 throw new RClientException("You haven't install your network param.");
             var transactions = new List<DeployWithTransaction>();
-            var event_data = get_event_data(block_hash);
+            var event_data = GetEventData(blockHash);
             var deploys = event_data.Result.Deploys;
             foreach (var deploy in deploys)
             {

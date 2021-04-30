@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace dotrchain
 {
@@ -69,35 +67,30 @@ new rl(`rho:registry:lookup`), RevVaultCh, vaultCh, toVaultCh, deployerId(`rho:r
             this.client = client;
         }
 
-        public long get_balance(string revAddr, string block_hash = "")
+        public long GetBalance(string revAddr, string blockHash = "")
         {
-            //    contract = render_contract_template(
-            //    ,
-            //    { 'addr': rev_addr},
-            //)
             var contract = string.Format(GET_BALANCE_RHO_TPL, revAddr);
-            var result = client.ExploratoryDeploy(contract, block_hash);
+            var result = client.ExploratoryDeploy(contract, blockHash);
             return result[0].Exprs[0].GInt;
-            //return int(result[0].exprs[0].g_int)
         }
 
         /// <summary>
         /// Transfer from `from_addr` to `to_addr` in the chain.Just make sure the `to_addr` is created
         /// in the chain. Otherwise, the transfer would hang until the `to_addr` is created.
         /// </summary>
-        /// <param name="from_addr"></param>
-        /// <param name="to_addr"></param>
+        /// <param name="fromAddr"></param>
+        /// <param name="toAddr"></param>
         /// <param name="amount"></param>
         /// <param name="key"></param>
-        /// <param name="phlo_price"></param>
-        /// <param name="phlo_limit"></param>
+        /// <param name="phloPrice"></param>
+        /// <param name="phloLimit"></param>
         /// <returns></returns>
-        public string transfer(string from_addr, string to_addr, long amount, PrivateKey key, 
-            long phlo_price = TRANSFER_PHLO_PRICE, long phlo_limit = TRANSFER_PHLO_LIMIT)
+        public string Transfer(string fromAddr, string toAddr, long amount, PrivateKey key, 
+            long phloPrice = TRANSFER_PHLO_PRICE, long phloLimit = TRANSFER_PHLO_LIMIT)
         {
-            var contract = string.Format(TRANSFER_RHO_TPL, from_addr, to_addr, amount);
+            var contract = string.Format(TRANSFER_RHO_TPL, fromAddr, toAddr, amount);
             var timestamp_mill = Util.DateTimeToUtc(DateTime.Now.ToUniversalTime());
-            return client.DeployWithVabnFilled(key, contract, phlo_price, phlo_limit, timestamp_mill);
+            return client.DeployWithVabnFilled(key, contract, phloPrice, phloLimit, timestamp_mill);
         }
         /// <summary>
         /// The difference between `transfer_ensure` and `transfer` is that , if the to_addr is not created in the
@@ -105,28 +98,28 @@ new rl(`rho:registry:lookup`), RevVaultCh, vaultCh, toVaultCh, deployerId(`rho:r
         /// can be sure that if the `to_addr` is not existed in the chain the process would created the vault in the chain
         /// and make the transfer successfully.
         /// </summary>
-        /// <param name="from_addr"></param>
-        /// <param name="to_addr"></param>
+        /// <param name="fromAddr"></param>
+        /// <param name="toAddr"></param>
         /// <param name="amount"></param>
         /// <param name="key"></param>
-        /// <param name="phlo_price"></param>
-        /// <param name="phlo_limit"></param>
+        /// <param name="phloPrice"></param>
+        /// <param name="phloLimit"></param>
         /// <returns></returns>
-        public string transfer_ensure(string from_addr, string to_addr, long amount, PrivateKey key,
-                    long phlo_price = TRANSFER_PHLO_PRICE,
-                    long phlo_limit = TRANSFER_PHLO_LIMIT)
+        public string TransferEnsure(string fromAddr, string toAddr, long amount, PrivateKey key,
+                    long phloPrice = TRANSFER_PHLO_PRICE,
+                    long phloLimit = TRANSFER_PHLO_LIMIT)
         {
-            var contract = string.Format(TRANSFER_ENSURE_TO_RHO_TPL, from_addr, to_addr, amount);
+            var contract = string.Format(TRANSFER_ENSURE_TO_RHO_TPL, fromAddr, toAddr, amount);
             var timestamp_mill = Util.DateTimeToUtc(DateTime.Now.ToUniversalTime());
-            return client.DeployWithVabnFilled(key, contract, phlo_price, phlo_limit, timestamp_mill);
+            return client.DeployWithVabnFilled(key, contract, phloPrice, phloLimit, timestamp_mill);
         }
 
-        public string create_vault(string addr,PrivateKey key,
-            long phlo_price= TRANSFER_PHLO_PRICE, long phlo_limit= TRANSFER_PHLO_LIMIT)
+        public string CreateVault(string addr,PrivateKey key,
+            long phloPrice = TRANSFER_PHLO_PRICE, long phloLimit= TRANSFER_PHLO_LIMIT)
         {
             var contract = string.Format(CREATE_VAULT_RHO_TPL, addr);
             var timestamp_mill = Util.DateTimeToUtc(DateTime.Now.ToUniversalTime());
-            return client.DeployWithVabnFilled(key, contract, phlo_price, phlo_limit, timestamp_mill);
+            return client.DeployWithVabnFilled(key, contract, phloPrice, phloLimit, timestamp_mill);
         }
     }
 }
