@@ -350,3 +350,4 @@ MigrationBackup/
 .ionide/
 /dotrchain/protobuf/cmd.txt
 /dotrchain/key.txt
+/dotrchain/questions.txt

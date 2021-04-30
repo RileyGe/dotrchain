@@ -8,60 +8,36 @@ using Google.Protobuf;
 
 namespace dotrchain
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class RClientException : Exception
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="message"></param>
         public RClientException(string message) : base(message) { }
-    }
-    //    public class DataQueries
-    //    {
+    }  
 
-    //    public static Par public_names(List<string> names)
-    //        {
-    //exprs = [Expr(g_string = n) for n in names]
-    //        return Par(exprs= exprs)
-    //        }
-
-
-    //    public Par deploy_id(string deploy_id)
-    //        {
-    //            var g_deploy_id = new GDeployId()
-    //            {
-    //                Sig = Google.Protobuf.ByteString.CopyFrom(Util.HexToBytes(deploy_id))
-    //            };
-    //            var g_unforgeable = new GUnforgeable()
-    //            {
-    //                GDeployIdBody = g_deploy_id
-    //            };
-    //            var gun = new Google.Protobuf.Collections.RepeatedField<GUnforgeable>
-    //            {
-    //                g_unforgeable
-    //            };
-
-    //            var ppp = new Par()
-    //            {
-    //                Unforgeables = gun
-    //            };
-    //            return ppp;
-    //        }
-
-    //    }
-
-
+    /// <summary>
+    /// 
+    /// </summary>
     public class Transaction
     {
-        public string from_addr;
-        public string to_addr;
-        public long amount;
+        public string FromAddress;
+        public string ToAddress;
+        public long Amount;
         public Par ret_unforgeable;
-        public bool success; //: Optional[Tuple[bool, str]]
-        public string reason;
+        public bool Success; //: Optional[Tuple[bool, str]]
+        public string Reason;
         //public DeployInfo deploy;
     }
 
     public class DeployWithTransaction
     {
-        public DeployInfo deploy_info;
-        public List<Transaction> transactions;
+        public DeployInfo DeployInfo;
+        public List<Transaction> Transactions;
     }
     public class RClient
     {
@@ -69,19 +45,31 @@ namespace dotrchain
         private readonly Channel channel;
         private readonly DeployService.DeployServiceClient client;
         private Par param;
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="host"></param>
+        /// <param name="port"></param>
+        /// <param name="options"></param>
         public RClient(string host, int port, IEnumerable<ChannelOption> options = null)
         {
             if (options is null) options = new ChannelOption[] { };
             channel = new Channel(host, port, ChannelCredentials.Insecure, options);
             client = new DeployService.DeployServiceClient(channel);
         }
-
+        /// <summary>
+        /// config the net parameter(mainnet or testnet)
+        /// </summary>
+        /// <param name="netParam">net parameter(main net or testnet)</param>
         public void ConfigParam(Par netParam)
         {
-            this.param = netParam;
+            param = netParam;
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="depth"></param>
+        /// <returns></returns>
         public List<BlockInfoResponse> ShowBlocks(int depth)
         {
             var blocksQuery = new BlocksQuery
@@ -92,7 +80,11 @@ namespace dotrchain
             var result = HandleStream(response);
             return result.ConvertAll(item => item as BlockInfoResponse);
         }
-
+        /// <summary>
+        /// get the block information using block hash
+        /// </summary>
+        /// <param name="blockHash">block hash</param>
+        /// <returns>block information</returns>
         public BlockInfo ShowBlock(string blockHash)
         {
             var blockQuery = new BlockQuery()
@@ -107,7 +99,10 @@ namespace dotrchain
             }
             return response.BlockInfo;
         }
-
+        /// <summary>
+        /// get the last finalized block information
+        /// </summary>
+        /// <returns>the last finalized block information</returns>
         public BlockInfo LastFinalizedBlock()
         {
             var query = new LastFinalizedBlockQuery();
@@ -119,7 +114,11 @@ namespace dotrchain
             //CheckResponse(response);
             return response.BlockInfo;
         }
-
+        /// <summary>
+        /// the block is finalized or not
+        /// </summary>
+        /// <param name="blockHash">block hash</param>
+        /// <returns>return true if is finalized, else return false</returns>
         public bool IsFinalized(string blockHash)
         {
             var query = new IsFinalizedQuery()
@@ -134,7 +133,12 @@ namespace dotrchain
             //self._check_response(response)
             return response.IsFinalized;
         }
-
+        /// <summary>
+        /// get blocks information by heights
+        /// </summary>
+        /// <param name="startBlockNumber">start block number</param>
+        /// <param name="endBlockNumber">end block number</param>
+        /// <returns>this list of block information</returns>
         public List<BlockInfoResponse> GetBlocksByHeights(long startBlockNumber, long endBlockNumber)
         {
             var query = new BlocksQueryByHeight()
@@ -146,7 +150,13 @@ namespace dotrchain
             var result = HandleStream(response);
             return result.ConvertAll(item => item as BlockInfoResponse);
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="term"></param>
+        /// <param name="blockHash"></param>
+        /// <param name="usePreStateHash"></param>
+        /// <returns></returns>
         public List<Par> ExploratoryDeploy(string term, string blockHash, bool usePreStateHash = false)
         {
             var query = new ExploratoryDeployQuery()
@@ -162,7 +172,11 @@ namespace dotrchain
             }
             return response.Result.PostBlockData.AsEnumerable().ToList();
         }
-
+        /// <summary>
+        /// find deploy information by deploy id
+        /// </summary>
+        /// <param name="deployId">deploy id</param>
+        /// <returns>the deploy information</returns>
         public LightBlockInfo FindDeploy(string deployId)
         {
             var query = new FindDeployQuery()
@@ -176,14 +190,27 @@ namespace dotrchain
             }
             return response.BlockInfo;
         }
-
+        /// <summary>
+        /// deploy a contract to rchain
+        /// </summary>
+        /// <param name="key">private key</param>
+        /// <param name="term">the contract</param>
+        /// <param name="phloPrice">phlo price</param>
+        /// <param name="phloLimit">phlo limit</param>
+        /// <param name="validAfterBlockNo">valid after block number</param>
+        /// <param name="timestampMillis">timestamp(using for sign the deploy data)</param>
+        /// <returns>the deploy id</returns>
         public string Deploy(PrivateKey key, string term, long phloPrice, long phloLimit,
             long validAfterBlockNo = -1, long timestampMillis = -1)
         {
             var deployData = Util.SignDeploy(key, term, phloPrice, phloLimit, validAfterBlockNo, timestampMillis);
             return SendDeploy(deployData);
         }
-
+        /// <summary>
+        /// send deploy
+        /// </summary>
+        /// <param name="deploy">deploy data(you can get the deploy data using Util.SignDeploy)</param>
+        /// <returns>the deploy id</returns>
         public string SendDeploy(DeployDataProto deploy)
         {
             var response = client.doDeploy(deploy);
@@ -194,8 +221,16 @@ namespace dotrchain
             //sig of deploy data is deployId
             return Util.BytesToHex(deploy.Sig.ToByteArray());
         }
-
-        public string DeployWithVabnFilled(PrivateKey key, string term, long phloPrice, long phloLimit, long timestampMillis = -1)
+        /// <summary>
+        /// deploy a contract to rchain with the valid after block number filled
+        /// </summary>
+        /// <param name="key">private key</param>
+        /// <param name="term">the contract</param>
+        /// <param name="phloPrice">phlo price</param>
+        /// <param name="phloLimit">phlo limit</param>
+        /// <param name="timestampMillis">timestamp(using for sign the deploy data)</param>
+        /// <returns>the deploy id</returns>
+        public string DeployWithVABNFilled(PrivateKey key, string term, long phloPrice, long phloLimit, long timestampMillis = -1)
         {
             var latestBlocks = ShowBlocks(1);
             // when the genesis block is not ready, it would be empty in show_blocks
@@ -208,6 +243,11 @@ namespace dotrchain
             var latestBlockNum = latestBlock.BlockInfo.BlockNumber;
             return Deploy(key, term, phloPrice, phloLimit, latestBlockNum, timestampMillis);
         }
+        /// <summary>
+        /// get event information
+        /// </summary>
+        /// <param name="blockHash">block hash</param>
+        /// <returns>the event information</returns>
         public EventInfoResponse GetEventData(string blockHash)
         {
             var query = new BlockQuery()
@@ -221,6 +261,11 @@ namespace dotrchain
             }
             return response;
         }
+        /// <summary>
+        /// get transactions by block hash
+        /// </summary>
+        /// <param name="blockHash">block hash</param>
+        /// <returns>the DeployWithTransaction list</returns>
         public List<DeployWithTransaction> GetTransactions(string blockHash)
         {
             if (param is null)
@@ -239,27 +284,28 @@ namespace dotrchain
                 // normally there are precharge, user and refund deploy, 3 totally.
                 else if (deploy.Report.Count == 3)
                 {
-                    //var precharge = deploy.Report[0];
                     var user = deploy.Report[1];
-                    //var refund = deploy.Report[2];
-                    //var report = new Report(precharge, user, refund);
                     transactions.Add(new DeployWithTransaction()
                     {
-                        deploy_info = deploy.DeployInfo,
-                        transactions = FindTransferComm(user, this.param)
+                        DeployInfo = deploy.DeployInfo,
+                        Transactions = FindTransferComm(user, this.param)
                     });
-                    //transactions.Add(findTransferComm(deploy.DeployInfo, user, this.transferTem));                        
                 }
 
             }
             return transactions;
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="report"></param>
+        /// <param name="transferTemplateUnforgeable"></param>
+        /// <returns></returns>
         private List<Transaction> FindTransferComm(SingleReport report, Par transferTemplateUnforgeable)
         {
             var transfers = new List<ReportProto>();
             var transactions = new List<Transaction>();
             foreach (var item in report.Events)
-            //report.eventsList.forEach((event) => 
             {
                 if (item.Comm != null)
                 {
@@ -271,16 +317,14 @@ namespace dotrchain
                         var fromAddr = item.Comm.Produces[0].Data.Pars[0].Exprs[0].GString;
                         var toAddr = item.Comm.Produces[0].Data.Pars[2].Exprs[0].GString;
                         var amount = item.Comm.Produces[0].Data.Pars[3].Exprs[0].GInt;
-                        //event.comm.producesList [0].data.parsList [3].exprsList [0].gInt;
 
                         var ret = item.Comm.Produces[0].Data.Pars[5];
                         transactions.Add(new Transaction()
                         {
-                            from_addr = fromAddr,
-                            to_addr = toAddr,
-                            amount = amount,
+                            FromAddress = fromAddr,
+                            ToAddress = toAddr,
+                            Amount = amount,
                             ret_unforgeable = ret,
-                            //deploy = deploy
                         });
                     }
                 }
@@ -300,16 +344,16 @@ namespace dotrchain
                             var data = item.Produce.Data;
                             var result = data.Pars[0].Exprs[0].ETupleBody.Ps[0].Exprs[0].GBool;
                             var reason = result ? "" : data.Pars[0].Exprs[0].ETupleBody.Ps[1].Exprs[0].GString;
-                            transaction.success = result;
-                            transaction.reason = reason;
+                            transaction.Success = result;
+                            transaction.Reason = reason;
                             walletCreated = true;
                         }
                     }
                 }
                 if (walletCreated == false)
                 {
-                    transaction.success = true;
-                    transaction.reason = "Possibly the transfer toAddr wallet is not created in chain. Create the wallet to make transaction succeed.";
+                    transaction.Success = true;
+                    transaction.Reason = "Possibly the transfer toAddr wallet is not created in chain. Create the wallet to make transaction succeed.";
                 }
             });
             return transactions;
@@ -330,6 +374,9 @@ namespace dotrchain
             }
             return list;
         }
+        /// <summary>
+        /// close the client
+        /// </summary>
         public void Close()
         {
             channel.ShutdownAsync();

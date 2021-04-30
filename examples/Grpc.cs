@@ -61,7 +61,7 @@ namespace examples
             // valid after block number is not auto filled by fetching the newest block number which would be assure
             // your block number is valid for the validator
             // Strongly recommend you use this method unless you know what you are doing.
-            var deploy_id2 = client.DeployWithVabnFilled(admin_key, contract, 1, 1000000, Util.DateTimeToUtc(DateTime.Now.ToUniversalTime()));
+            var deploy_id2 = client.DeployWithVABNFilled(admin_key, contract, 1, 1000000, Util.DateTimeToUtc(DateTime.Now.ToUniversalTime()));
             // this will raise a exception
             try
             {

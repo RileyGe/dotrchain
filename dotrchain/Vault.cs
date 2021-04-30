@@ -90,7 +90,7 @@ new rl(`rho:registry:lookup`), RevVaultCh, vaultCh, toVaultCh, deployerId(`rho:r
         {
             var contract = string.Format(TRANSFER_RHO_TPL, fromAddr, toAddr, amount);
             var timestamp_mill = Util.DateTimeToUtc(DateTime.Now.ToUniversalTime());
-            return client.DeployWithVabnFilled(key, contract, phloPrice, phloLimit, timestamp_mill);
+            return client.DeployWithVABNFilled(key, contract, phloPrice, phloLimit, timestamp_mill);
         }
         /// <summary>
         /// The difference between `transfer_ensure` and `transfer` is that , if the to_addr is not created in the
@@ -111,7 +111,7 @@ new rl(`rho:registry:lookup`), RevVaultCh, vaultCh, toVaultCh, deployerId(`rho:r
         {
             var contract = string.Format(TRANSFER_ENSURE_TO_RHO_TPL, fromAddr, toAddr, amount);
             var timestamp_mill = Util.DateTimeToUtc(DateTime.Now.ToUniversalTime());
-            return client.DeployWithVabnFilled(key, contract, phloPrice, phloLimit, timestamp_mill);
+            return client.DeployWithVABNFilled(key, contract, phloPrice, phloLimit, timestamp_mill);
         }
 
         public string CreateVault(string addr,PrivateKey key,
@@ -119,7 +119,7 @@ new rl(`rho:registry:lookup`), RevVaultCh, vaultCh, toVaultCh, deployerId(`rho:r
         {
             var contract = string.Format(CREATE_VAULT_RHO_TPL, addr);
             var timestamp_mill = Util.DateTimeToUtc(DateTime.Now.ToUniversalTime());
-            return client.DeployWithVabnFilled(key, contract, phloPrice, phloLimit, timestamp_mill);
+            return client.DeployWithVABNFilled(key, contract, phloPrice, phloLimit, timestamp_mill);
         }
     }
 }

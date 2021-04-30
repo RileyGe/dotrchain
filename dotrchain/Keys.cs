@@ -15,6 +15,9 @@ using System.IO;
 
 namespace dotrchain
 {
+    /// <summary>
+    /// private key
+    /// </summary>
     public class PrivateKey
     {
         private ECPrivateKeyParameters privateKey;
@@ -88,12 +91,6 @@ namespace dotrchain
             var generator = new ECKeyPairGenerator("ECDSA");
             generator.Init(keyParams);
             var keyPair = generator.GenerateKeyPair();
-            ////for test
-            //var prKey = new PrivateKey(keyPair.Private as ECPrivateKeyParameters);
-            //var puKey = new PublicKey(keyPair.Public as ECPublicKeyParameters);
-
-            //if(!prKey.PublicKey.Equals(puKey))            
-            //    throw new Exception("get public key from private key error!");
 
             return new PrivateKey(keyPair.Private as ECPrivateKeyParameters);
         }
@@ -105,7 +102,11 @@ namespace dotrchain
         {
             return Util.BytesToHex(this.Bytes);
         }
-
+        /// <summary>
+        /// sign data with private key
+        /// </summary>
+        /// <param name="data">data to be signed</param>
+        /// <returns>signed data</returns>
         public byte[] Sign(byte[] data)
         {
             byte[] hashed = Util.Blake2b(data);
@@ -124,7 +125,9 @@ namespace dotrchain
             generate.Close();
             return ms.ToArray();
         }       
-
+        /// <summary>
+        /// get public key from private key
+        /// </summary>
         public PublicKey PublicKey
         {
             get
@@ -135,7 +138,11 @@ namespace dotrchain
                 return new PublicKey(new ECPublicKeyParameters(q, domain));
             }
         }
-
+        /// <summary>
+        /// Equal method of private key
+        /// </summary>
+        /// <param name="obj">comparisons</param>
+        /// <returns>equal return true, else return false</returns>
         public override bool Equals(object obj)
         {
             if (obj is PrivateKey)
@@ -145,14 +152,25 @@ namespace dotrchain
             }
             return false;
         }
+        /// <summary>
+        /// get hash code
+        /// </summary>
+        /// <returns>hash code of the private key</returns>
         public override int GetHashCode()
         {
             return base.GetHashCode();
         }        
     }
+    /// <summary>
+    /// public key
+    /// </summary>
     public class PublicKey
     {
         private ECPublicKeyParameters publicKey;
+        /// <summary>
+        /// create public key from key bytes
+        /// </summary>
+        /// <param name="publicKeyBytes">the public key bytes</param>
         public PublicKey(byte[] publicKeyBytes)
         {
             X9ECParameters curveParams = ECNamedCurveTable.GetByName("secp256k1");
@@ -161,11 +179,18 @@ namespace dotrchain
             ECDomainParameters domainParams = new ECDomainParameters(curve, curveParams.G, curveParams.N, curveParams.H);
             this.publicKey = new ECPublicKeyParameters(decodePoint, domainParams);
         }
+        /// <summary>
+        /// create public key from key hex
+        /// </summary>
+        /// <param name="publicKeyHex">the public key hex</param>
         public PublicKey(string publicKeyHex) : this(Util.HexToBytes(publicKeyHex)) { }
         public PublicKey(ECPublicKeyParameters pk)
         {
             this.publicKey = pk;
         }
+        /// <summary>
+        /// public key bytes
+        /// </summary>
         public byte[] Bytes
         {
             get
@@ -173,33 +198,36 @@ namespace dotrchain
                 return this.publicKey.Q.GetEncoded();
             }
         }
-
+        /// <summary>
+        /// verify that the signature matches the data or not
+        /// </summary>
+        /// <param name="signature">the signature</param>
+        /// <param name="data">the data</param>
+        /// <returns>return true if match, else return false</returns>
         public bool Verify(byte[] signature, byte[] data)
         {
             var hashed = Util.Blake2b(data);
-            //ISigner signer = SignerUtilities.GetSigner("NONEwithECDSA");
-            //signer.Init(false, this.publicKey);
-            //signer.BlockUpdate(hashed, 0, hashed.Length);
-            //return signer.VerifySignature(signature);
 
             ECDsaSigner signer = new ECDsaSigner();
-            //X9ECParameters paramsd = SecNamedCurves.GetByName("secp256k1");
-            //ECDomainParameters ecParams = new ECDomainParameters(paramsd.Curve, paramsd.G, paramsd.N, paramsd.H);
             var decoder = new Asn1InputStream(signature);
-            var seq = decoder.ReadObject() as DerSequence;
-            if ((seq == null) || (seq.Count != 2))
+            if ((!(decoder.ReadObject() is DerSequence seq)) || (seq.Count != 2))
                 throw new ArgumentException("InvalidDERSignature");
             var R = ((DerInteger)seq[0]).Value;
             var S = ((DerInteger)seq[1]).Value;
             signer.Init(false, this.publicKey);
             return signer.VerifySignature(hashed, R, S);
         }
-
+        /// <summary>
+        /// get public key hex
+        /// </summary>
+        /// <returns>public key hex</returns>
         public string ToHex()
         {
             return Util.BytesToHex(this.Bytes);
         }
-
+        /// <summary>
+        /// ethereum address of the public key
+        /// </summary>
         public string EthAddress
         {
             get
@@ -213,7 +241,9 @@ namespace dotrchain
                 return rawHex.Substring(rawHex.Length - 40);
             }
         }
-
+        /// <summary>
+        /// rev address of the public key
+        /// </summary>
         public string RevAddress
         {
             get 
@@ -239,7 +269,11 @@ namespace dotrchain
                 return Base58CheckEncoding.EncodePlain(addressBytes);
             }
         }
-
+        /// <summary>
+        /// Equal method of private key
+        /// </summary>
+        /// <param name="obj">comparisons</param>
+        /// <returns>equal return true, else return false</returns>
         public override bool Equals(object obj)
         {
             if(obj is PublicKey)
@@ -249,6 +283,10 @@ namespace dotrchain
             }
             return false;
         }
+        /// <summary>
+        /// get hash code
+        /// </summary>
+        /// <returns>hash code</returns>
         public override int GetHashCode()
         {
             return base.GetHashCode();
